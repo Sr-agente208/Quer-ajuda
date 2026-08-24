@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <title>Quer Ajuda? — Entrar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <section class="brand-panel" aria-label="Quer Ajuda">
+      <div class="orange-shape top-shape"></div>
+      <div class="orange-shape bottom-shape"></div>
+      <div class="brand-content">
+        <div class="brand-logo" aria-hidden="true">
+          <img src="WhatsApp%20Image%202026-08-24%20at%2009.27.55.jpeg" alt="" />
+        </div>
+        <p class="eyebrow">Apoio de verdade, quando você precisar</p>
+        <h1>Quer <span>ajuda?</span></h1>
+        <p class="brand-copy">Conectamos você a uma rede de cuidado, orientação e acolhimento.</p>
+      </div>
+      <p class="brand-footer">© 2026 querajuda.com</p>
+    </section>
+
+    <section class="login-panel" aria-labelledby="login-title">
+      <div class="mobile-mark">
+        <div class="mini-logo"><img src="WhatsApp%20Image%202026-08-24%20at%2009.27.55.jpeg" alt="" /></div>
+        <strong>quer ajuda?</strong>
+      </div>
+      <div class="login-card">
+        <div class="welcome-dot">✦</div>
+        <p class="overline">BEM-VINDO DE VOLTA</p>
+        <h2 id="login-title">Entre na sua conta</h2>
+        <p class="intro">Informe seus dados para continuar.</p>
+
+        <form id="login-form" novalidate>
+          <label for="email">E-mail</label>
+          <div class="field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17v11h-17zM4 7l8 6 8-6" /></svg>
+            <input id="email" name="email" type="email" placeholder="voce@email.com" autocomplete="email" required />
+          </div>
+          <label for="password">Senha</label>
+          <div class="field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+            <input id="password" name="password" type="password" placeholder="Sua senha" autocomplete="current-password" required minlength="6" />
+            <button class="eye" type="button" aria-label="Mostrar senha" id="password-toggle">◉</button>
+          </div>
+          <div class="form-options">
+            <label class="remember"><input type="checkbox" name="remember" /><span></span>Lembrar de mim</label>
+            <button type="button" class="text-link" data-action="recover">Esqueci minha senha</button>
+          </div>
+          <button class="submit-button" type="submit">Entrar <span>→</span></button>
+          <p class="form-message" id="form-message" aria-live="polite"></p>
+        </form>
+        <div class="divider"><span>ou</span></div>
+        <p class="signup">Ainda não tem uma conta? <button type="button" class="text-link strong" data-action="signup">Criar conta</button></p>
+      </div>
+    </section>
+  </main>
+  <dialog id="info-dialog">
+    <button class="dialog-close" aria-label="Fechar">×</button>
+    <div class="dialog-icon">?</div>
+    <h2 id="dialog-title">Recuperar senha</h2>
+    <p id="dialog-copy">Em breve você poderá recuperar o acesso por e-mail.</p>
+    <button class="submit-button dialog-button">Entendi</button>
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>
