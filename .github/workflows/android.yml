@@ -2,7 +2,7 @@ name: Gerar APK Android
 
 on:
   push:
-    branches: [main]
+    branches: [main, arena/01a0367a-quer-ajuda]
   workflow_dispatch:
 
 jobs:
@@ -26,6 +26,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: '34'
+          arch: x86_64
+
       - name: Instalar dependências
         run: npm ci
 
@@ -34,8 +40,10 @@ jobs:
 
       - name: Preparar projeto Android
         run: |
-          npx cap add android
-          npx cap copy android
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
 
       - name: Compilar APK de teste
         run: |
@@ -48,4 +56,14 @@ jobs:
         with:
           name: quer-ajuda-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 14
+          retention-days: 30
+
+      - name: Criar Release no GitHub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          generate_release_notes: true
+          tag_name: v1.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
