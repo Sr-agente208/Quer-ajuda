@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Quer Ajuda?" />
+  <title>Baixar Quer Ajuda? — APK Android</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=24" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</head>
+<body class="home-body">
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema">
+    <svg viewBox="0 0 24 24" aria-hidden="true" id="theme-icon">
+      <path class="icon-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor" stroke="none"/>
+      <g class="icon-sun" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </g>
+      <g class="icon-auto" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>
+      </g>
+    </svg>
+  </button>
+
+  <header class="home-header">
+    <div class="home-header-inner">
+      <a href="home.html" class="home-logo"><strong>Quer <span>Ajuda?</span></strong></a>
+      <div class="home-header-actions">
+        <a class="a11y-btn a11y-btn--ghost" href="home.html"><span aria-hidden="true">↩</span> Voltar</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <section class="hero">
+      <div class="hero-text">
+        <h1 class="hero-title">Baixar o <span>app</span></h1>
+        <p class="hero-sub">Instale o Quer Ajuda? no seu Android. É rápido, leve e funciona offline.</p>
+      </div>
+    </section>
+
+    <section class="download-grid">
+      <a class="download-card download-card--primary" href="https://github.com/Sr-agente208/Quer-ajuda/releases/latest" target="_blank" rel="noopener">
+        <span class="download-icon" aria-hidden="true">📱</span>
+        <h2 class="download-title">Baixar APK</h2>
+        <p class="download-info">Última versão disponível</p>
+        <p class="download-cta">Toque para baixar o arquivo</p>
+      </a>
+
+      <a class="download-card" href="https://github.com/Sr-agente208/Quer-ajuda/actions" target="_blank" rel="noopener">
+        <span class="download-icon" aria-hidden="true">⚙️</span>
+        <h2 class="download-title">Ver build (GitHub Actions)</h2>
+        <p class="download-info">Status do build do APK</p>
+        <p class="download-cta">Toque para ver o histórico</p>
+      </a>
+
+      <a class="download-card download-card--alt" href="index.html">
+        <span class="download-icon" aria-hidden="true">🌐</span>
+        <h2 class="download-title">Usar como PWA</h2>
+        <p class="download-info">Sem instalar nada</p>
+        <p class="download-cta">Toque para abrir o site</p>
+      </a>
+    </section>
+
+    <section class="info-block">
+      <h2>Como instalar o APK no Android</h2>
+      <ol class="install-steps">
+        <li>Toque no botão <strong>"Baixar APK"</strong> acima.</li>
+        <li>Quando o download terminar, abra o arquivo <code>app-debug.apk</code>.</li>
+        <li>O Android vai pedir permissão pra instalar de fontes desconhecidas — <strong>permita</strong>.</li>
+        <li>Toque em <strong>Instalar</strong> e pronto!</li>
+        <li>Procure o ícone "?" do Quer Ajuda? na sua tela inicial.</li>
+      </ol>
+      <p><strong>Dica:</strong> Se não conseguir instalar, tente pelo <a href="https://github.com/Sr-agente208/Quer-ajuda/actions" target="_blank" rel="noopener">GitHub Actions</a> → último build verde (✓) → <em>Artifacts</em> → baixar <em>quer-ajuda-apk</em>.</p>
+    </section>
+
+    <section class="info-block">
+      <h2>Não quer instalar nada?</h2>
+      <p>Use o Quer Ajuda? direto no navegador, igual a um app:</p>
+      <ol class="install-steps">
+        <li>Abra <a href="index.html" target="_blank">sr-agente208.github.io/Quer-ajuda</a> no Chrome.</li>
+        <li>Toque nos <strong>3 pontinhos</strong> (⋮) do Chrome.</li>
+        <li>Toque em <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar app"</strong>.</li>
+        <li>Pronto — o ícone "?" aparece na tela inicial do celular.</li>
+      </ol>
+      <p>Funciona <strong>offline</strong>, abre em <strong>tela cheia</strong> e não precisa atualizar pela Play Store.</p>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <p>© 2026 querajuda.com — Um site simples para você</p>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+    const SUPABASE_URL = 'https://ymttnsejqmizghaqoewv.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_79Ogt01EvlMLbH6ZPalk-g_Usi6ZlDR';
+    let sb = null;
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage, storageKey: 'querajuda.auth' }
+        });
+      }
+    } catch (e) {}
+
+    // Theme toggle
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const root = document.documentElement;
+      const cur = root.getAttribute('data-theme') || 'light';
+      const next = ['light', 'dark', 'auto'][(['light', 'dark', 'auto'].indexOf(cur) + 1) % 3];
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('querajuda.theme', next); } catch (e) {}
+    });
+  })();
+  </script>
+</body>
+</html>

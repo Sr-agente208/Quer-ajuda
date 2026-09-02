@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <title>Quer Ajuda? — Início</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Quer Ajuda?" />
+  <link rel="stylesheet" href="styles.css?v=19" />
+  <script>
+    (function() {
+      // Aplica tema IMEDIATAMENTE antes de qualquer renderização
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="home-body">
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema">
+    <svg viewBox="0 0 24 24" aria-hidden="true" id="theme-icon">
+      <path class="icon-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor" stroke="none"/>
+      <g class="icon-sun" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </g>
+      <g class="icon-auto" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <rect x="3" y="4" width="18" height="14" rx="2"/>
+        <path d="M8 21h8M12 18v3"/>
+      </g>
+    </svg>
+  </button>
+
+  <header class="home-header" id="home-header">
+    <div class="home-header-inner">
+      <a href="home.html" class="home-logo" aria-label="Quer Ajuda - Início">
+        <strong>Quer <span>Ajuda?</span></strong>
+      </a>
+      <div class="home-header-actions">
+        <button class="a11y-btn" id="font-up" type="button" aria-label="Aumentar letras">
+          Aumentar letras
+        </button>
+        <button class="a11y-btn" id="read-page" type="button" aria-label="Ouvir a página">
+          <span class="a11y-icon" aria-hidden="true">🔊</span> Ouvir
+        </button>
+        <a class="a11y-btn a11y-btn--ghost" href="#" id="logout-btn" aria-label="Sair da conta">
+          <span class="a11y-icon" aria-hidden="true">↩</span> Sair
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <section class="hero">
+      <div class="hero-text">
+        <h1 class="hero-title" id="hero-title">Olá! Como podemos <span>ajudar?</span></h1>
+        <p class="hero-sub" id="hero-sub">Tudo em um só lugar, com letras grandes e botões simples.</p>
+      </div>
+      <aside class="clock-card" aria-label="Data e hora atual">
+        <p class="clock-date" id="clock-date">—</p>
+        <p class="clock-time" id="clock-time">--:--</p>
+        <p class="clock-msg">Você está no lugar certo.</p>
+      </aside>
+    </section>
+
+    <section class="cards-grid" aria-label="Recursos disponíveis">
+      <a class="feature-card" href="remedios.html">
+        <span class="feature-emoji">💊</span>
+        <h2 class="feature-title">Meus remédios</h2>
+        <p class="feature-desc">Cadastre e acompanhe seus medicamentos.</p>
+      </a>
+      <a class="feature-card" href="consultas.html">
+        <span class="feature-emoji">📅</span>
+        <h2 class="feature-title">Consultas</h2>
+        <p class="feature-desc">Organize seus próximos compromissos médicos.</p>
+      </a>
+      <a class="feature-card" href="#">
+        <span class="feature-emoji">👨‍👩‍👧</span>
+        <h2 class="feature-title">Pessoas importantes</h2>
+        <p class="feature-desc" id="pessoas-desc">Gerencie seus vínculos de cuidado.</p>
+      </a>
+      <a class="feature-card" href="contato.html">
+        <span class="feature-emoji">💬</span>
+        <h2 class="feature-title">Fale conosco</h2>
+        <p class="feature-desc">WhatsApp, e-mail e telefone para te ajudar.</p>
+      </a>
+      <a class="feature-card" href="download.html">
+        <span class="feature-emoji">📱</span>
+        <h2 class="feature-title">Baixar o app</h2>
+        <p class="feature-desc">Instale o Quer Ajuda? no seu Android.</p>
+      </a>
+      <a class="feature-card" href="#">
+        <span class="feature-emoji">🔊</span>
+        <h2 class="feature-title">Ouvir a página</h2>
+        <p class="feature-desc">Use o botão "Ouvir" acima para narrar.</p>
+      </a>
+      <a class="feature-card feature-card--sos" href="#">
+        <span class="feature-emoji">🆘</span>
+        <h2 class="feature-title">Preciso de ajuda</h2>
+        <p class="feature-desc">Encontre rapidamente os números de emergência.</p>
+      </a>
+    </section>
+
+    <section class="shortcuts" aria-label="Atalhos rápidos">
+      <h2 class="shortcuts-title">Atalhos rápidos</h2>
+      <div class="shortcuts-row">
+        <a class="shortcut shortcut--call" href="tel:192">📞 Emergência (192)</a>
+        <a class="shortcut shortcut--call" href="tel:188">💬 CVV (188)</a>
+        <a class="shortcut shortcut--guide" href="#" id="shortcut-vinculo">🤝 Vincular idoso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <p>© 2026 querajuda.com — Um site simples para você</p>
+  </footer>
+
+  <dialog id="vinculo-dialog">
+    <button class="dialog-close" aria-label="Fechar">×</button>
+    <div class="dialog-icon">🤝</div>
+    <h2>Vincular idoso</h2>
+    <p>Informe o e-mail do idoso que você cuida.</p>
+    <div style="text-align:left;margin-top:14px">
+      <label for="vinculo-email">E-mail do idoso</label>
+      <div class="field"><input id="vinculo-email" type="email" placeholder="idoso@email.com" /></div>
+    </div>
+    <button class="submit-button dialog-button" id="vinculo-submit">Vincular</button>
+  </dialog>
+
+  <script src="supabase.js?v=10"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    // Aguarda o supabase.js inicializar
+    function ready() {
+      return new Promise((resolve) => {
+        if (window.sbAPI) return resolve();
+        const check = () => {
+          if (window.sbAPI) resolve();
+          else setTimeout(check, 50);
+        };
+        check();
+      });
+    }
+
+    ready().then(async () => {
+      // Guard: precisa estar logado
+      const user = await window.sbAPI.getCurrentUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+      const profile = await window.sbAPI.getMyProfile();
+      if (profile) {
+        if (profile.theme) document.documentElement.setAttribute('data-theme', profile.theme);
+        if (profile.font_scale) document.documentElement.style.setProperty('--font-scale', String(profile.font_scale));
+        const name = (profile.full_name || user.email.split('@')[0]).split(' ')[0]; // só primeiro nome
+        const title = document.getElementById('hero-title');
+        if (title) {
+          if (profile.role === 'idoso') {
+            title.innerHTML = 'Olá, <span style="color:var(--orange)">' + name + '!</span><br>Como podemos <span>ajudar?</span>';
+          } else {
+            title.innerHTML = 'Olá, <span style="color:var(--orange)">' + name + '!</span><br>Vamos cuidar de alguém?';
+          }
+        }
+        const sub = document.getElementById('hero-sub');
+        if (sub) {
+          if (profile.role === 'idoso') {
+            sub.textContent = 'Conteúdos pensados para você, com calma e clareza. Estamos aqui para te apoiar.';
+          } else {
+            sub.textContent = 'Ferramentas para você cuidar de quem você ama. Acompanhe tudo em um só lugar.';
+          }
+        }
+        if (profile.role === 'responsavel') {
+          const linked = await window.sbAPI.getMyLinkedIdosoIds();
+          const desc = document.getElementById('pessoas-desc');
+          if (desc) {
+            desc.textContent = linked.length === 0
+              ? 'Você ainda não tem idosos vinculados. Use o atalho abaixo.'
+              : linked.length + ' idoso(s) vinculado(s).';
+          }
+        }
+      }
+    });
+
+    // Theme toggle
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const root = document.documentElement;
+      const cur = root.getAttribute('data-theme') || 'light';
+      const order = ['light', 'dark', 'auto'];
+      const next = order[(order.indexOf(cur) + 1) % 3];
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('querajuda.theme', next); } catch (e) {}
+      if (window.sbAPI) window.sbAPI.updateMyPreferences({ theme: next }).catch(() => {});
+    });
+
+    // Logout
+    document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (window.sbAPI) await window.sbAPI.signOut();
+      try { localStorage.removeItem('querajuda.auth'); } catch (err) {}
+      window.location.href = 'index.html';
+    });
+
+    // Vincular idoso
+    document.getElementById('shortcut-vinculo')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const d = document.getElementById('vinculo-dialog');
+      if (d && typeof d.showModal === 'function') d.showModal();
+    });
+    document.getElementById('vinculo-submit')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('vinculo-email').value || '').trim();
+      if (!email) { alert('Informe o e-mail'); return; }
+      // Buscar idoso pelo e-mail via RPC (precisa criar a função no Supabase)
+      // Workaround: pegar todos os profiles que tenham role = 'idoso' e o user com aquele e-mail
+      const { data: profiles, error: pErr } = await window.sbAPI.supabase
+        .from('profiles')
+        .select('id, full_name')
+        .limit(100);
+      if (pErr) { alert('Erro: ' + pErr.message); return; }
+      // Como não temos acesso ao email do user via anon, vamos usar auth.admin.listUsers via RPC
+      // Por enquanto, mostramos mensagem de limitação
+      alert('Para vincular um idoso, peça para ele abrir o app, gerar um código de vinculação e te passar.\n\n(Por enquanto, esse fluxo é manual. Em breve ficará automático.)');
+      const d = document.getElementById('vinculo-dialog');
+      if (d && typeof d.close === 'function') d.close();
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.dialog-close') || (e.target.closest('.dialog-button') && e.target.closest('#vinculo-dialog'))) {
+        const d = document.getElementById('vinculo-dialog');
+        if (d && typeof d.close === 'function') d.close();
+      }
+    });
+
+    // Relógio
+    const dateEl = document.getElementById('clock-date');
+    const timeEl = document.getElementById('clock-time');
+    const weekdays = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+    const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const pad = n => n < 10 ? '0' + n : '' + n;
+    function tick() {
+      const now = new Date();
+      if (dateEl) dateEl.textContent = weekdays[now.getDay()] + ', ' + now.getDate() + ' de ' + months[now.getMonth()];
+      if (timeEl) timeEl.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+    }
+    tick();
+    setInterval(tick, 15000);
+
+    // Aumentar fonte
+    const root = document.documentElement;
+    const sizeKey = 'querajuda.fontScale';
+    let currentScale = parseFloat(localStorage.getItem(sizeKey) || '1') || 1;
+    root.style.setProperty('--font-scale', String(currentScale));
+    document.getElementById('font-up')?.addEventListener('click', () => {
+      currentScale = currentScale >= 1.5 ? 1 : +(currentScale + 0.1).toFixed(2);
+      root.style.setProperty('--font-scale', String(currentScale));
+      try { localStorage.setItem(sizeKey, String(currentScale)); } catch (e) {}
+      if (window.sbAPI) window.sbAPI.updateMyPreferences({ font_scale: currentScale }).catch(() => {});
+    });
+
+    // Ouvir
+    const readBtn = document.getElementById('read-page');
+    let reading = false;
+    readBtn?.addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) { alert('Seu navegador não tem suporte a leitura em voz alta.'); return; }
+      if (reading) { window.speechSynthesis.cancel(); reading = false; return; }
+      const tEl = document.querySelector('.hero-title');
+      const sEl = document.querySelector('.hero-sub');
+      const text = (tEl ? tEl.textContent : '') + '. ' + (sEl ? sEl.textContent : '');
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR'; u.rate = 0.95;
+      u.onend = () => { reading = false; };
+      u.onerror = () => { reading = false; };
+      reading = true;
+      window.speechSynthesis.speak(u);
+    });
+  })();
+  </script>
+</body>
+</html>

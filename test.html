@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teste Supabase</title>
+</head>
+<body>
+  <h1>Teste de carregamento do Supabase</h1>
+  <div id="status" style="font-family:monospace;padding:20px;background:#222;color:#0f0;min-height:200px"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js?v=10"></script>
+  <script>
+    const status = document.getElementById('status');
+    function log(msg) {
+      status.innerHTML += msg + '<br/>';
+      console.log(msg);
+    }
+    log('1. window.supabase existe? ' + (typeof window.supabase !== 'undefined'));
+    log('2. window.supabase.createClient existe? ' + (window.supabase && typeof window.supabase.createClient === 'function'));
+    log('3. window.sb existe? ' + (typeof window.sb !== 'undefined'));
+    log('4. window.sbAPI existe? ' + (typeof window.sbAPI !== 'undefined'));
+
+    if (window.sbAPI) {
+      log('5. Tentando pegar usuário atual...');
+      window.sbAPI.getCurrentUser().then(user => {
+        log('6. User: ' + JSON.stringify(user));
+        if (user) {
+          return window.sbAPI.getMyProfile();
+        }
+      }).then(profile => {
+        log('7. Profile: ' + JSON.stringify(profile));
+      }).catch(err => {
+        log('ERRO: ' + err.message);
+      });
+    } else {
+      log('FALHA: window.sbAPI não foi criado. Supabase não carregou.');
+    }
+  </script>
+</body>
+</html>
