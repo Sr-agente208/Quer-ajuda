@@ -27,7 +27,7 @@ jobs:
         with:
           api-level: '34'
           arch: x86_64
-      - run: npm ci
+            - run: npm install
       - run: npm run build
       - run: npx cap add android || echo "ja existe"
       - run: npx cap sync android
