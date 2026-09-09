@@ -1,4 +1,4 @@
-// Cliente Supabase compartilhado entre as páginas
+npx supabase link --project-ref SEU_PROJECT_REFnpx supabase link --project-ref SEU_PROJECT_REF// Cliente Supabase compartilhado entre as páginas
 // Usa CDN jsDelivr (não precisa de bundler)
 const SUPABASE_URL = 'https://ymttnsejqmizghaqoewv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_79Ogt01EvlMLbH6ZPalk-g_Usi6ZlDR';
