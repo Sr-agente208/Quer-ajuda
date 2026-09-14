@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <title>Quer Ajuda? — Minha localização</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=19" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+    })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .loc-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 18px 80px;
+    }
+    .loc-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .loc-back {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .loc-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 2rem;
+      color: var(--text);
+      margin: 0;
+    }
+    .loc-status {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .loc-status--active {
+      border-color: #4caf50;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }
+    .loc-status__icon {
+      font-size: 4rem;
+      margin-bottom: 8px;
+    }
+    .loc-status__title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.4rem;
+      color: var(--text);
+      margin: 8px 0;
+    }
+    .loc-status__desc {
+      color: var(--muted);
+      font-size: 1rem;
+      margin: 4px 0 0;
+    }
+    .btn-loc {
+      width: 100%;
+      padding: 22px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-bottom: 14px;
+    }
+    .btn-loc:active { transform: scale(0.97); }
+    .btn-loc--primary {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: white;
+      box-shadow: 0 6px 18px rgba(76,175,80,0.35);
+    }
+    .btn-loc--stop {
+      background: linear-gradient(135deg, #ef5350, #c62828);
+      color: white;
+      box-shadow: 0 6px 18px rgba(239,83,80,0.35);
+    }
+    .btn-loc--sos {
+      background: linear-gradient(135deg, #ff5722, #d84315);
+      color: white;
+      box-shadow: 0 8px 22px rgba(255,87,34,0.5);
+      font-size: 1.5rem;
+      animation: pulse-sos 2s infinite;
+    }
+    @keyframes pulse-sos {
+      0%,100% { box-shadow: 0 8px 22px rgba(255,87,34,0.5); }
+      50% { box-shadow: 0 8px 32px rgba(255,87,34,0.95); }
+    }
+    .btn-loc--secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 2px solid var(--border);
+      box-shadow: none;
+    }
+    .loc-info {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .loc-info__row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .loc-info__row:last-child { border-bottom: none; }
+    .loc-info__label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .loc-info__value {
+      color: var(--text);
+      font-weight: 700;
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+    }
+    .loc-help {
+      background: #fff8e1;
+      border: 2px solid #ffd54f;
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-top: 18px;
+      color: #5d4037;
+    }
+    [data-theme="dark"] .loc-help {
+      background: #3e2c00;
+      border-color: #5d4037;
+      color: #ffe082;
+    }
+    .loc-help strong { display: block; margin-bottom: 6px; font-size: 1.05rem; }
+    .toast-loc {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .toast-loc.show { opacity: 1; }
+    .toast-loc.ok { background: #2e7d32; }
+    .toast-loc.err { background: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="loc-container">
+    <div class="loc-header">
+      <a class="loc-back" href="home.html" aria-label="Voltar">← Voltar</a>
+      <h1 class="loc-title">📍 Estou aqui</h1>
+    </div>
+
+    <div id="loc-status-card" class="loc-status">
+      <div class="loc-status__icon" id="loc-icon">📍</div>
+      <h2 class="loc-status__title" id="loc-title">Compartilhar localização</h2>
+      <p class="loc-status__desc" id="loc-desc">Toque no botão verde pra deixar quem cuida de você saber onde você está.</p>
+    </div>
+
+    <button class="btn-loc btn-loc--primary" id="btn-compartilhar">
+      ✅ Começar a compartilhar
+    </button>
+
+    <button class="btn-loc btn-loc--stop" id="btn-parar" style="display:none">
+      ⏸️ Parar de compartilhar
+    </button>
+
+    <div class="loc-info" id="loc-info" style="display:none">
+      <div class="loc-info__row">
+        <span class="loc-info__label">📍 Endereço</span>
+        <span class="loc-info__value" id="info-endereco">—</span>
+      </div>
+      <div class="loc-info__row">
+        <span class="loc-info__label">🕐 Última atualização</span>
+        <span class="loc-info__value" id="info-hora">—</span>
+      </div>
+      <div class="loc-info__row">
+        <span class="loc-info__label">🎯 Precisão</span>
+        <span class="loc-info__value" id="info-precisao">—</span>
+      </div>
+    </div>
+
+    <button class="btn-loc btn-loc--sos" id="btn-sos">
+      🆘 PRECISO DE AJUDA AGORA
+    </button>
+
+    <button class="btn-loc btn-loc--secondary" id="btn-tobom">
+      👋 Tô bem!
+    </button>
+
+    <div class="loc-help">
+      <strong>💡 Como funciona?</strong>
+      • Toque em <b>"Começar a compartilhar"</b> pra enviar sua localização pra quem cuida de você.<br>
+      • Toque em <b>"Tô bem!"</b> quando quiser avisar que tá tudo certo.<br>
+      • Em emergência, toque no botão <b style="color:#c62828">VERMELHO</b> que a pessoa responsável recebe um aviso no WhatsApp com seu local.
+    </div>
+  </div>
+
+  <div class="toast-loc" id="toast"></div>
+
+  <script src="supabase.js?v=10"></script>
+  <script src="script-localizacao.js?v=1"></script>
+</body>
+</html>

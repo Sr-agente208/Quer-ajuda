@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+.vite
+.cache
+coverage
+.DS_Store
+*.log
+.env
+.env.local
+android/app/build
+android/build
+android/.gradle
+android/local.properties
+ios/Pods
+ios/build
+preview-*.png

@@ -1,0 +1,8 @@
+{
+  "appId": "com.querajuda.app",
+  "appName": "Quer Ajuda",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <title>Quer Ajuda? — Conectar família</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=24" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+    })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .vin-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 18px 100px;
+    }
+    .vin-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .vin-back {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .vin-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.6rem;
+      color: var(--text);
+      margin: 0;
+    }
+
+    /* Card de escolha de papel */
+    .vin-role-pick {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 8px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .vin-role-btn {
+      padding: 14px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .vin-role-btn.active {
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      color: white;
+    }
+
+    .vin-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 20px;
+      margin-bottom: 16px;
+    }
+    .vin-panel h2 {
+      margin: 0 0 6px;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      font-size: 1.3rem;
+    }
+    .vin-panel p { margin: 0 0 14px; color: var(--muted); }
+
+    /* Código gigante */
+    .vin-codigo-wrap {
+      background: linear-gradient(135deg, #72cbbd 0%, #4a9b8e 100%);
+      border-radius: 20px;
+      padding: 28px 16px;
+      margin: 16px 0;
+      text-align: center;
+      position: relative;
+    }
+    .vin-codigo {
+      font-family: 'Courier New', monospace;
+      font-size: 3.6rem;
+      font-weight: 900;
+      letter-spacing: 12px;
+      color: white;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      user-select: all;
+      cursor: pointer;
+      margin: 8px 0;
+    }
+    .vin-codigo-tempo {
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .vin-codigo-expira {
+      color: #ffeb3b;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .vin-codigo-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .vin-mini-btn {
+      padding: 12px;
+      background: rgba(255,255,255,0.95);
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #2e7d74;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .vin-mini-btn:active { transform: scale(0.97); }
+
+    /* Input do responsável */
+    .vin-input {
+      width: 100%;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      text-align: center;
+      background: var(--bg);
+      border: 3px solid var(--border);
+      border-radius: 16px;
+      color: var(--text);
+      text-transform: uppercase;
+      font-family: 'Courier New', monospace;
+      box-sizing: border-box;
+    }
+    .vin-input:focus {
+      outline: none;
+      border-color: #72cbbd;
+    }
+    .vin-big-btn {
+      width: 100%;
+      padding: 20px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 14px;
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      color: white;
+      box-shadow: 0 4px 12px rgba(114,203,189,0.4);
+    }
+    .vin-big-btn:active { transform: scale(0.97); }
+    .vin-big-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .vin-helper {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+    .vin-helper strong { color: var(--text); }
+
+    /* Lista de vínculos já feitos */
+    .vin-list {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .vin-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .vin-list-item:last-child { border-bottom: none; }
+    .vin-list-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .vin-list-info { flex: 1; }
+    .vin-list-nome { font-weight: 700; color: var(--text); }
+    .vin-list-sub { font-size: 0.85rem; color: var(--muted); }
+
+    .toast-loc {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast-loc.show { opacity: 1; }
+    .toast-loc.ok { background: #2e7d32; }
+    .toast-loc.err { background: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="vin-container">
+    <div class="vin-header">
+      <a class="vin-back" href="home.html">← Voltar</a>
+      <h1 class="vin-title">🤝 Conectar família</h1>
+    </div>
+
+    <!-- Vínculos existentes -->
+    <div class="vin-list" id="vinculos-list" style="display:none">
+      <h3 style="margin:0 0 10px;color:var(--text)">✅ Já conectados</h3>
+      <div id="vinculos-itens"></div>
+    </div>
+
+    <div class="vin-role-pick">
+      <button class="vin-role-btn active" id="role-idoso" data-role="idoso">👴 Sou idoso</button>
+      <button class="vin-role-btn" id="role-resp" data-role="responsavel">👨‍👩‍👧 Sou familiar</button>
+    </div>
+
+    <!-- PAINEL IDOSO -->
+    <div class="vin-panel" id="panel-idoso">
+      <h2>Como conectar:</h2>
+      <p>Mostre o código abaixo pra quem cuida de você. A pessoa digita o código no celular dela e pronto!</p>
+
+      <div class="vin-codigo-wrap">
+        <div class="vin-codigo" id="meu-codigo">------</div>
+        <div class="vin-codigo-tempo" id="codigo-tempo">⏰ Expira em 5:00</div>
+      </div>
+
+      <div class="vin-codigo-actions">
+        <button class="vin-mini-btn" id="btn-copiar">📋 Copiar</button>
+        <button class="vin-mini-btn" id="btn-compartilhar">📤 Enviar</button>
+      </div>
+
+      <div class="vin-helper">
+        <strong>📌 Passo a passo:</strong><br>
+        1. Toque em <b>"Enviar"</b> pra mandar pelo WhatsApp<br>
+        2. Ou peça pra pessoa ler o código da sua tela<br>
+        3. Ela digita no celular dela<br>
+        4. ✅ Conectado!
+      </div>
+    </div>
+
+    <!-- PAINEL RESPONSÁVEL -->
+    <div class="vin-panel" id="panel-resp" style="display:none">
+      <h2>Digite o código:</h2>
+      <p>Peça pra pessoa idosa abrir o app e mostrar o código de 6 letras.</p>
+
+      <input class="vin-input" id="input-codigo" type="text" maxlength="6" placeholder="ABC123" autocomplete="off" inputmode="text" />
+      <button class="vin-big-btn" id="btn-vincular">✅ Conectar</button>
+
+      <div class="vin-helper">
+        <strong>💡 Não tem o código?</strong><br>
+        Peça pra pessoa idosa abrir o <b>Quer Ajuda?</b> no celular dela e tocar no botão <b>"Conectar família"</b> (ícone 🤝).
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-loc" id="toast"></div>
+
+  <script src="supabase.js?v=10"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    function ready() {
+      return new Promise((resolve) => {
+        if (window.sbAPI) return resolve();
+        const check = () => {
+          if (window.sbAPI) resolve();
+          else setTimeout(check, 50);
+        };
+        check();
+      });
+    }
+
+    function $(id) { return document.getElementById(id); }
+    function toast(msg, type) {
+      const t = $('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.className = 'toast-loc show ' + (type || '');
+      setTimeout(() => { t.className = 'toast-loc'; }, 3500);
+    }
+
+    // Gera código de 6 chars sem I/O (confusos)
+    function gerarCodigo() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let codigo = '';
+      for (let i = 0; i < 6; i++) {
+        codigo += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return codigo;
+    }
+
+    let codigoAtual = null;
+    let codigoExpira = 0;
+    let codigoTimer = null;
+
+    function formatarTempo(ms) {
+      const total = Math.max(0, Math.floor(ms / 1000));
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    async function atualizarCodigo(user) {
+      if (Date.now() > codigoExpira - 30000) { // renova 30s antes
+        codigoAtual = gerarCodigo();
+        codigoExpira = Date.now() + 5 * 60 * 1000;
+        try {
+          await window.sbAPI.supabase.from('vinculo_codigos').upsert({
+            idoso_id: user.id,
+            codigo: codigoAtual,
+            expires_at: new Date(codigoExpira).toISOString(),
+            created_at: new Date().toISOString()
+          }, { onConflict: 'idoso_id' });
+        } catch (e) {
+          console.warn('vinculo_codigos:', e.message);
+        }
+      }
+      $('meu-codigo').textContent = codigoAtual;
+    }
+
+    function iniciarTimer() {
+      if (codigoTimer) clearInterval(codigoTimer);
+      codigoTimer = setInterval(() => {
+        const restante = codigoExpira - Date.now();
+        if (restante <= 0) {
+          $('codigo-tempo').innerHTML = '<span class="vin-codigo-expira">⚠️ Código expirou, atualizando...</span>';
+        } else {
+          $('codigo-tempo').textContent = '⏰ Expira em ' + formatarTempo(restante);
+        }
+      }, 1000);
+    }
+
+    async function carregarVinculos(user, profile) {
+      try {
+        let links = [];
+        if (profile.role === 'idoso') {
+          const { data } = await window.sbAPI.supabase
+            .from('care_links').select('responsavel_id').eq('idoso_id', user.id);
+          links = data || [];
+        } else {
+          const { data } = await window.sbAPI.supabase
+            .from('care_links').select('idoso_id').eq('responsavel_id', user.id);
+          links = data || [];
+        }
+        if (links.length === 0) return;
+
+        const ids = links.map(l => profile.role === 'idoso' ? l.responsavel_id : l.idoso_id);
+        const { data: profiles } = await window.sbAPI.supabase
+          .from('profiles').select('id, full_name').in('id', ids);
+
+        const itens = (profiles || []).map(p => {
+          const inicial = (p.full_name || '?').charAt(0).toUpperCase();
+          const primeiro = (p.full_name || 'Familiar').split(' ')[0];
+          return '<div class="vin-list-item">' +
+            '<div class="vin-list-avatar">' + inicial + '</div>' +
+            '<div class="vin-list-info">' +
+              '<div class="vin-list-nome">' + primeiro + '</div>' +
+              '<div class="vin-list-sub">' + (profile.role === 'idoso' ? 'Cuida de você' : 'Idoso vinculado') + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        $('vinculos-itens').innerHTML = itens;
+        $('vinculos-list').style.display = '';
+      } catch (e) {}
+    }
+
+    async function tentarVincular(user) {
+      const input = ($('input-codigo').value || '').trim().toUpperCase().replace(/\s/g, '');
+      if (input.length !== 6) {
+        toast('Digite os 6 caracteres do código', 'err');
+        return;
+      }
+
+      const btn = $('btn-vincular');
+      btn.disabled = true;
+      btn.textContent = '⏳ Conectando...';
+
+      try {
+        const { data: codigos, error } = await window.sbAPI.supabase
+          .from('vinculo_codigos')
+          .select('*')
+          .eq('codigo', input)
+          .gt('expires_at', new Date().toISOString())
+          .limit(1);
+
+        if (error || !codigos || codigos.length === 0) {
+          toast('Código inválido ou expirado. Peça um novo!', 'err');
+          btn.disabled = false;
+          btn.textContent = '✅ Conectar';
+          return;
+        }
+
+        const idosoId = codigos[0].idoso_id;
+        if (idosoId === user.id) {
+          toast('Você não pode conectar com você mesmo', 'err');
+          btn.disabled = false;
+          btn.textContent = '✅ Conectar';
+          return;
+        }
+
+        const { error: linkErr } = await window.sbAPI.supabase
+          .from('care_links')
+          .insert({ responsavel_id: user.id, idoso_id: idosoId });
+
+        if (linkErr) {
+          if (linkErr.message.includes('duplicate') || linkErr.code === '23505') {
+            toast('Vocês já estão conectados!', 'ok');
+            setTimeout(() => location.reload(), 1200);
+          } else {
+            toast('Erro: ' + linkErr.message, 'err');
+            btn.disabled = false;
+            btn.textContent = '✅ Conectar';
+          }
+          return;
+        }
+
+        toast('🎉 Conectado com sucesso!', 'ok');
+        // limpa o código depois de usar
+        await window.sbAPI.supabase.from('vinculo_codigos').delete().eq('idoso_id', idosoId);
+        setTimeout(() => { window.location.href = 'rastreamento.html'; }, 1500);
+      } catch (e) {
+        toast('Erro ao conectar. Tente de novo.', 'err');
+        btn.disabled = false;
+        btn.textContent = '✅ Conectar';
+      }
+    }
+
+    function copiarCodigo() {
+      const txt = codigoAtual;
+      const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); toast('Código copiado!', 'ok'); }
+        catch (e) { toast('Não consegui copiar', 'err'); }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(() => toast('Código copiado!', 'ok')).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function compartilharCodigo() {
+      const msg = encodeURIComponent(
+        'Oi! Pra gente se conectar no Quer Ajuda? 📱\n\n' +
+        'Abre o app, toca em "Conectar família" e digita este código:\n\n' +
+        '*' + codigoAtual + '*\n\n' +
+        '(o código expira em 5 minutos)'
+      );
+      window.open('https://wa.me/?text=' + msg, '_blank');
+    }
+
+    ready().then(async () => {
+      const user = await window.sbAPI.getCurrentUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+      const profile = await window.sbAPI.getMyProfile();
+      if (!profile) { window.location.href = 'index.html'; return; }
+
+      // Carrega vínculos existentes
+      await carregarVinculos(user, profile);
+
+      // Tabs (permite trocar manualmente)
+      $('role-idoso').addEventListener('click', () => switchRole('idoso'));
+      $('role-resp').addEventListener('click', () => switchRole('responsavel'));
+
+      function switchRole(r) {
+        if (r === 'idoso') {
+          $('role-idoso').classList.add('active');
+          $('role-resp').classList.remove('active');
+          $('panel-idoso').style.display = '';
+          $('panel-resp').style.display = 'none';
+        } else {
+          $('role-idoso').classList.remove('active');
+          $('role-resp').classList.add('active');
+          $('panel-idoso').style.display = 'none';
+          $('panel-resp').style.display = '';
+        }
+      }
+
+      // Mostra a tab certa pro role, mas permite trocar
+      if (profile.role === 'idoso') {
+        switchRole('idoso');
+        await atualizarCodigo(user);
+        iniciarTimer();
+        // renova a cada 30s pra manter atualizado
+        setInterval(() => atualizarCodigo(user), 30000);
+      } else {
+        switchRole('responsavel');
+      }
+
+      $('btn-copiar').addEventListener('click', copiarCodigo);
+      $('btn-compartilhar').addEventListener('click', compartilharCodigo);
+      $('btn-vincular').addEventListener('click', () => tentarVincular(user));
+      $('input-codigo').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') tentarVincular(user);
+      });
+      $('input-codigo').addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      });
+      // Permite colar com ctrl+v
+      $('input-codigo').addEventListener('paste', (e) => {
+        e.preventDefault();
+        const txt = (e.clipboardData || window.clipboardData).getData('text');
+        e.target.value = txt.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+      });
+    });
+
+  })();
+  </script>
+</body>
+</html>

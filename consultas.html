@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <title>Consultas — Quer Ajuda?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Quer Ajuda?" />
+  <link rel="stylesheet" href="styles.css?v=19" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="home-body">
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema">
+    <svg viewBox="0 0 24 24" aria-hidden="true" id="theme-icon">
+      <path class="icon-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor" stroke="none"/>
+      <g class="icon-sun" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </g>
+      <g class="icon-auto" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>
+      </g>
+    </svg>
+  </button>
+
+  <header class="home-header">
+    <div class="home-header-inner">
+      <a href="home.html" class="home-logo"><strong>Quer <span>Ajuda?</span></strong></a>
+      <div class="home-header-actions">
+        <a class="a11y-btn a11y-btn--ghost" href="home.html"><span aria-hidden="true">↩</span> Voltar</a>
+        <a class="a11y-btn a11y-btn--ghost" href="#" data-action="logout"><span aria-hidden="true">⎋</span> Sair</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <section class="hero">
+      <div class="hero-text">
+        <h1 class="hero-title">Minhas <span>consultas</span></h1>
+        <p class="hero-sub" id="hero-sub">Organize seus próximos compromissos médicos.</p>
+      </div>
+    </section>
+
+    <section class="form-card" aria-label="Adicionar consulta">
+      <h2 class="form-card-title">Adicionar nova</h2>
+      <form id="consulta-form" class="stack-form">
+        <label for="con-title">Título</label>
+        <div class="field"><input id="con-title" required placeholder="Ex: Consulta com cardiologista" /></div>
+        <label for="con-specialty">Especialidade</label>
+        <div class="field"><input id="con-specialty" placeholder="Ex: Cardiologia" /></div>
+        <label for="con-location">Local</label>
+        <div class="field"><input id="con-location" placeholder="Ex: Hospital São Lucas" /></div>
+        <label for="con-when">Data e hora</label>
+        <div class="field"><input id="con-when" type="datetime-local" required /></div>
+        <label for="con-notes">Observações</label>
+        <div class="field"><input id="con-notes" placeholder="Ex: levar exames anteriores" /></div>
+        <button class="submit-button" type="submit">Adicionar consulta</button>
+      </form>
+    </section>
+
+    <section class="cards-grid" id="consultas-list" aria-label="Consultas cadastradas">
+      <p class="empty-msg">Carregando...</p>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <p>© 2026 querajuda.com</p>
+  </footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js?v=10"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    function ready() {
+      return new Promise((resolve) => {
+        if (window.sbAPI) return resolve();
+        const check = () => window.sbAPI ? resolve() : setTimeout(check, 50);
+        check();
+      });
+    }
+
+    ready().then(async () => {
+      const user = await window.sbAPI.getCurrentUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+      const profile = await window.sbAPI.getMyProfile();
+      if (profile) {
+        if (profile.theme) document.documentElement.setAttribute('data-theme', profile.theme);
+        if (profile.font_scale) document.documentElement.style.setProperty('--font-scale', String(profile.font_scale));
+      }
+    });
+
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const root = document.documentElement;
+      const cur = root.getAttribute('data-theme') || 'light';
+      const order = ['light', 'dark', 'auto'];
+      const next = order[(order.indexOf(cur) + 1) % 3];
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('querajuda.theme', next); } catch (e) {}
+    });
+
+    document.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-action="logout"]')) {
+        e.preventDefault();
+        if (window.sbAPI) await window.sbAPI.signOut();
+        window.location.href = 'index.html';
+      }
+    });
+
+    let currentIdosoId = null;
+    async function setupContext() {
+      const user = await window.sbAPI.getCurrentUser();
+      if (!user) return null;
+      const profile = await window.sbAPI.getMyProfile();
+      if (!profile) return null;
+      if (profile.role === 'responsavel') {
+        const linked = await window.sbAPI.getMyLinkedIdosoIds();
+        if (linked.length === 0) {
+          document.getElementById('consulta-form').innerHTML = '<p class="empty-msg">Você ainda não tem nenhum idoso vinculado.</p>';
+          return null;
+        }
+        currentIdosoId = linked[0];
+      } else {
+        currentIdosoId = user.id;
+      }
+      return currentIdosoId;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function fmtDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' });
+    }
+
+    async function loadConsultas() {
+      const id = await setupContext();
+      if (!id) return;
+      const list = document.getElementById('consultas-list');
+      const { data, error } = await window.sbAPI.supabase
+        .from('consultas')
+        .select('*')
+        .eq('idoso_id', id)
+        .order('scheduled_at', { ascending: true });
+      if (error) {
+        list.innerHTML = '<p class="empty-msg">Erro: ' + error.message + '</p>';
+        return;
+      }
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="empty-msg" style="grid-column:1/-1">Nenhuma consulta cadastrada.</p>';
+        return;
+      }
+      list.innerHTML = data.map(c => `
+        <article class="feature-card" data-id="${c.id}">
+          <span class="feature-emoji">📅</span>
+          <h3 class="feature-title">${escapeHtml(c.title)}</h3>
+          ${c.specialty ? `<p class="feature-desc"><strong>Especialidade:</strong> ${escapeHtml(c.specialty)}</p>` : ''}
+          <p class="feature-desc"><strong>Quando:</strong> ${fmtDate(c.scheduled_at)}</p>
+          ${c.location ? `<p class="feature-desc"><strong>Local:</strong> ${escapeHtml(c.location)}</p>` : ''}
+          ${c.notes ? `<p class="feature-desc">${escapeHtml(c.notes)}</p>` : ''}
+          <button class="text-link" data-del="${c.id}" style="margin-top:10px;color:#d33b3b">Remover</button>
+        </article>
+      `).join('');
+    }
+
+    document.getElementById('consulta-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = currentIdosoId || await setupContext();
+      if (!id) return;
+      const title = document.getElementById('con-title').value.trim();
+      const specialty = document.getElementById('con-specialty').value.trim();
+      const location = document.getElementById('con-location').value.trim();
+      const scheduled_at = document.getElementById('con-when').value;
+      const notes = document.getElementById('con-notes').value.trim();
+      if (!title || !scheduled_at) return;
+      const { error } = await window.sbAPI.supabase.from('consultas').insert({
+        idoso_id: id, title, specialty, location, scheduled_at: new Date(scheduled_at).toISOString(), notes
+      });
+      if (error) { alert('Erro: ' + error.message); return; }
+      e.target.reset();
+      await loadConsultas();
+    });
+
+    document.getElementById('consultas-list')?.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      if (!confirm('Remover esta consulta?')) return;
+      const { error } = await window.sbAPI.supabase.from('consultas').delete().eq('id', btn.dataset.del);
+      if (error) { alert('Erro: ' + error.message); return; }
+      await loadConsultas();
+    });
+
+    loadConsultas();
+  })();
+  </script>
+  <style>
+    .stack-form{display:grid;gap:6px;text-align:left;max-width:520px}
+    .stack-form .submit-button{margin-top:14px}
+    .form-card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:24px;margin-bottom:24px}
+    .form-card-title{font-family:Nunito,sans-serif;font-size:1.4rem;margin:0 0 16px;color:var(--ink)}
+    .empty-msg{color:var(--muted);padding:20px;text-align:center}
+  </style>
+</body>
+</html>
