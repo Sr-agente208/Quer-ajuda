@@ -120,6 +120,16 @@
         <h2 class="feature-title">Preciso de ajuda</h2>
         <p class="feature-desc">Encontre rapidamente os números de emergência.</p>
       </a>
+      <a class="feature-card feature-card--track" id="card-localizacao" href="#">
+        <span class="feature-emoji">📍</span>
+        <h2 class="feature-title">Estou aqui</h2>
+        <p class="feature-desc">Compartilhe sua localização com quem cuida de você.</p>
+      </a>
+      <a class="feature-card feature-card--track" id="card-rastreamento" href="#" style="display:none">
+        <span class="feature-emoji">👨‍👩‍👧</span>
+        <h2 class="feature-title">Onde eles estão</h2>
+        <p class="feature-desc">Veja onde os idosos vinculados estão agora.</p>
+      </a>
     </section>
 
     <section class="shortcuts" aria-label="Atalhos rápidos">
@@ -198,6 +208,17 @@
               ? 'Você ainda não tem idosos vinculados. Use o atalho abaixo.'
               : linked.length + ' idoso(s) vinculado(s).';
           }
+          // Mostra card de rastreamento e esconde o de localização individual
+          const rast = document.getElementById('card-rastreamento');
+          if (rast) {
+            rast.style.display = '';
+            rast.setAttribute('href', 'rastreamento.html');
+          }
+          const loc = document.getElementById('card-localizacao');
+          if (loc) loc.style.display = 'none';
+        } else if (profile.role === 'idoso') {
+          const loc = document.getElementById('card-localizacao');
+          if (loc) loc.setAttribute('href', 'localizacao.html');
         }
       }
     });
