@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#72cbbd" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <title>Quer Ajuda? — Vincular idoso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=19" />
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('querajuda.theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t === 'dark' ? 'dark' : 'light';
+      } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+    })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .vin-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 18px 80px;
+    }
+    .vin-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .vin-back {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .vin-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.8rem;
+      color: var(--text);
+      margin: 0;
+    }
+    .vin-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .vin-tab {
+      padding: 16px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .vin-tab.active {
+      border-color: #72cbbd;
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      color: white;
+    }
+    .vin-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .vin-codigo {
+      font-family: 'Courier New', monospace;
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: 8px;
+      text-align: center;
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      color: white;
+      padding: 30px 20px;
+      border-radius: 16px;
+      margin: 16px 0;
+      user-select: all;
+    }
+    .vin-helper {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .vin-helper strong { color: var(--text); }
+    .btn-vin {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+    .btn-vin--primary {
+      background: linear-gradient(135deg, #72cbbd, #4a9b8e);
+      color: white;
+    }
+    .btn-vin--secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .vin-input {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-align: center;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      text-transform: uppercase;
+      font-family: 'Courier New', monospace;
+    }
+    .vin-input:focus {
+      outline: none;
+      border-color: #72cbbd;
+    }
+    .toast-loc {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .toast-loc.show { opacity: 1; }
+    .toast-loc.ok { background: #2e7d32; }
+    .toast-loc.err { background: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="vin-container">
+    <div class="vin-header">
+      <a class="vin-back" href="home.html">← Voltar</a>
+      <h1 class="vin-title">🤝 Vincular</h1>
+    </div>
+
+    <div class="vin-tabs">
+      <div class="vin-tab active" id="tab-idoso" data-tab="idoso">👴 Sou idoso</div>
+      <div class="vin-tab" id="tab-responsavel" data-tab="responsavel">👨‍👩‍👧 Sou responsável</div>
+    </div>
+
+    <!-- PAINEL IDOSO: gera código -->
+    <div class="vin-panel" id="panel-idoso">
+      <h2 style="margin:0 0 6px;font-family:'Nunito',sans-serif;color:var(--text)">Seu código</h2>
+      <p style="margin:0 0 14px;color:var(--muted)">Mostre esse código pra quem cuida de você. Ele vai digitar lá no celular dele pra se conectar.</p>
+      <div class="vin-codigo" id="meu-codigo">------</div>
+      <button class="btn-vin btn-vin--secondary" id="btn-copiar">📋 Copiar código</button>
+      <div class="vin-helper" style="margin-top:14px">
+        ⏰ <strong>Esse código muda a cada 5 minutos</strong> pra sua segurança.<br>
+        🔒 Só quem tiver sua conta vinculada consegue ver onde você está.
+      </div>
+    </div>
+
+    <!-- PAINEL RESPONSÁVEL: digita código -->
+    <div class="vin-panel" id="panel-responsavel" style="display:none">
+      <h2 style="margin:0 0 6px;font-family:'Nunito',sans-serif;color:var(--text)">Código do idoso</h2>
+      <p style="margin:0 0 14px;color:var(--muted)">Peça pra pessoa idosa abrir o app dela e te mostrar o código de 6 letras.</p>
+      <input class="vin-input" id="input-codigo" type="text" maxlength="6" placeholder="ABC123" autocomplete="off" />
+      <button class="btn-vin btn-vin--primary" id="btn-vincular">✅ Vincular</button>
+      <div class="vin-helper" style="margin-top:14px">
+        💡 <strong>Dica:</strong> o código tem 6 letras e números, sempre em maiúsculas.<br>
+        Se o código expirar, peça pra pessoa gerar um novo.
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-loc" id="toast"></div>
+
+  <script src="supabase.js?v=10"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    function ready() {
+      return new Promise((resolve) => {
+        if (window.sbAPI) return resolve();
+        const check = () => {
+          if (window.sbAPI) resolve();
+          else setTimeout(check, 50);
+        };
+        check();
+      });
+    }
+
+    function $(id) { return document.getElementById(id); }
+    function toast(msg, type) {
+      const t = $('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.className = 'toast-loc show ' + (type || '');
+      setTimeout(() => { t.className = 'toast-loc'; }, 3000);
+    }
+
+    // Gera código de 6 caracteres (A-Z, 0-9, sem I/O pra não confundir)
+    function gerarCodigo() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let codigo = '';
+      for (let i = 0; i < 6; i++) {
+        codigo += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return codigo;
+    }
+
+    let codigoAtual = null;
+    let codigoExpira = 0;
+    let codigoInterval = null;
+
+    async function atualizarCodigo(user) {
+      if (Date.now() > codigoExpira) {
+        codigoAtual = gerarCodigo();
+        codigoExpira = Date.now() + 5 * 60 * 1000; // 5 minutos
+        try {
+          await window.sbAPI.supabase.from('vinculo_codigos').upsert({
+            idoso_id: user.id,
+            codigo: codigoAtual,
+            expires_at: new Date(codigoExpira).toISOString(),
+            created_at: new Date().toISOString()
+          }, { onConflict: 'idoso_id' });
+        } catch (e) {
+          console.warn('Tabela vinculo_codigos não existe ainda:', e.message);
+        }
+      }
+      $('meu-codigo').textContent = codigoAtual;
+    }
+
+    async function tentarVincular(user) {
+      const input = ($('input-codigo').value || '').trim().toUpperCase().replace(/\s/g, '');
+      if (input.length !== 6) {
+        toast('Digite os 6 caracteres do código', 'err');
+        return;
+      }
+
+      try {
+        // Busca o código
+        const { data: codigos, error } = await window.sbAPI.supabase
+          .from('vinculo_codigos')
+          .select('*')
+          .eq('codigo', input)
+          .gt('expires_at', new Date().toISOString())
+          .limit(1);
+
+        if (error || !codigos || codigos.length === 0) {
+          toast('Código inválido ou expirado', 'err');
+          return;
+        }
+
+        const idosoId = codigos[0].idoso_id;
+
+        // Cria o vínculo
+        const { error: linkErr } = await window.sbAPI.supabase
+          .from('care_links')
+          .insert({ responsavel_id: user.id, idoso_id: idosoId });
+
+        if (linkErr) {
+          if (linkErr.message.includes('duplicate')) {
+            toast('Você já está vinculado a esse idoso!', 'err');
+          } else {
+            toast('Erro: ' + linkErr.message, 'err');
+          }
+          return;
+        }
+
+        toast('Vinculado com sucesso! 🎉', 'ok');
+        setTimeout(() => { window.location.href = 'rastreamento.html'; }, 1500);
+      } catch (e) {
+        toast('Tabela de códigos ainda não foi criada. Rode a migration no Supabase.', 'err');
+        console.error(e);
+      }
+    }
+
+    ready().then(async () => {
+      const user = await window.sbAPI.getCurrentUser();
+      if (!user) { window.location.href = 'index.html'; return; }
+      const profile = await window.sbAPI.getMyProfile();
+      if (!profile) { window.location.href = 'index.html'; return; }
+
+      const role = profile.role;
+
+      // Mostra a tab certa baseado no role
+      if (role === 'idoso') {
+        $('tab-idoso').classList.add('active');
+        $('panel-idoso').style.display = '';
+        $('panel-responsavel').style.display = 'none';
+        $('tab-responsavel').style.display = 'none';
+
+        await atualizarCodigo(user);
+        codigoInterval = setInterval(() => atualizarCodigo(user), 30000);
+      } else {
+        $('tab-idoso').style.display = 'none';
+        $('tab-responsavel').classList.add('active');
+        $('panel-idoso').style.display = 'none';
+        $('panel-responsavel').style.display = '';
+
+        // Tabs de fallback (caso alguém queira alternar manualmente)
+        document.querySelectorAll('.vin-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            const t = tab.dataset.tab;
+            document.querySelectorAll('.vin-tab').forEach(x => x.classList.remove('active'));
+            tab.classList.add('active');
+            if (t === 'idoso') {
+              $('panel-idoso').style.display = '';
+              $('panel-responsavel').style.display = 'none';
+            } else {
+              $('panel-idoso').style.display = 'none';
+              $('panel-responsavel').style.display = '';
+            }
+          });
+        });
+      }
+
+      // Botão copiar
+      $('btn-copiar').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(codigoAtual);
+          toast('Código copiado!', 'ok');
+        } catch (e) {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = codigoAtual;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          toast('Código copiado!', 'ok');
+        }
+      });
+
+      // Botão vincular (responsável)
+      $('btn-vincular').addEventListener('click', () => tentarVincular(user));
+      $('input-codigo').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') tentarVincular(user);
+      });
+      $('input-codigo').addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      });
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -95,7 +95,7 @@
         <h2 class="feature-title">Consultas</h2>
         <p class="feature-desc">Organize seus próximos compromissos médicos.</p>
       </a>
-      <a class="feature-card" href="#">
+      <a class="feature-card" href="vincular.html">
         <span class="feature-emoji">👨‍👩‍👧</span>
         <h2 class="feature-title">Pessoas importantes</h2>
         <p class="feature-desc" id="pessoas-desc">Gerencie seus vínculos de cuidado.</p>
@@ -245,25 +245,12 @@
     // Vincular idoso
     document.getElementById('shortcut-vinculo')?.addEventListener('click', (e) => {
       e.preventDefault();
-      const d = document.getElementById('vinculo-dialog');
-      if (d && typeof d.showModal === 'function') d.showModal();
+      window.location.href = 'vincular.html';
     });
     document.getElementById('vinculo-submit')?.addEventListener('click', async (e) => {
       e.preventDefault();
-      const email = (document.getElementById('vinculo-email').value || '').trim();
-      if (!email) { alert('Informe o e-mail'); return; }
-      // Buscar idoso pelo e-mail via RPC (precisa criar a função no Supabase)
-      // Workaround: pegar todos os profiles que tenham role = 'idoso' e o user com aquele e-mail
-      const { data: profiles, error: pErr } = await window.sbAPI.supabase
-        .from('profiles')
-        .select('id, full_name')
-        .limit(100);
-      if (pErr) { alert('Erro: ' + pErr.message); return; }
-      // Como não temos acesso ao email do user via anon, vamos usar auth.admin.listUsers via RPC
-      // Por enquanto, mostramos mensagem de limitação
-      alert('Para vincular um idoso, peça para ele abrir o app, gerar um código de vinculação e te passar.\n\n(Por enquanto, esse fluxo é manual. Em breve ficará automático.)');
-      const d = document.getElementById('vinculo-dialog');
-      if (d && typeof d.close === 'function') d.close();
+      // Redireciona pra nova tela de vinculação
+      window.location.href = 'vincular.html';
     });
     document.addEventListener('click', (e) => {
       if (e.target.closest('.dialog-close') || (e.target.closest('.dialog-button') && e.target.closest('#vinculo-dialog'))) {

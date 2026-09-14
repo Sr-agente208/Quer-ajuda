@@ -38,10 +38,38 @@ CREATE INDEX IF NOT EXISTS idx_checkins_user_time ON checkins(user_id, created_a
 -- Adiciona coluna phone na profiles se não existir
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone TEXT;
 
+-- Tabela de códigos temporários pra vincular idoso <-> responsável
+CREATE TABLE IF NOT EXISTS vinculo_codigos (
+  idoso_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  codigo TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vinculo_codigo ON vinculo_codigos(codigo);
+
 -- Habilita RLS
 ALTER TABLE localizacoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sos_alertas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE checkins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vinculo_codigos ENABLE ROW LEVEL SECURITY;
+
+-- Policies pra vinculo_codigos
+DROP POLICY IF EXISTS "Idoso pode criar/atualizar o próprio código" ON vinculo_codigos;
+CREATE POLICY "Idoso pode criar/atualizar o próprio código"
+  ON vinculo_codigos FOR ALL
+  USING (auth.uid() = idoso_id)
+  WITH CHECK (auth.uid() = idoso_id);
+
+DROP POLICY IF EXISTS "Qualquer logado pode ler códigos válidos" ON vinculo_codigos;
+CREATE POLICY "Qualquer logado pode ler códigos válidos"
+  ON vinculo_codigos FOR SELECT
+  USING (expires_at > now());
+
+DROP POLICY IF EXISTS "Responsáveis podem deletar códigos após vincular" ON vinculo_codigos;
+CREATE POLICY "Responsáveis podem deletar códigos após vincular"
+  ON vinculo_codigos FOR DELETE
+  USING (true);
 
 -- Policies pra localizacoes
 DROP POLICY IF EXISTS "Usuário pode atualizar a própria localização" ON localizacoes;
